@@ -19,25 +19,30 @@ export async function proxy(request: NextRequest) {
       },
     }
   )
+
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
 
   if (!user && path !== '/login') {
     return NextResponse.redirect(new URL('/login', request.url))
   }
-  if (user && path === '/login') {
-    const { data: usuario } = await supabase
-      .from('usuarios').select('rol').eq('id', user.id).single()
-    const destino = usuario?.rol === 'admin' ? '/admin/dashboard' : '/inicio'
-    return NextResponse.redirect(new URL(destino, request.url))
-  }
-  if (user && path.startsWith('/admin')) {
-    const { data: usuario } = await supabase
-      .from('usuarios').select('rol').eq('id', user.id).single()
-    if (usuario?.rol !== 'admin') {
-      return NextResponse.redirect(new URL('/inicio', request.url))
+
+  if (user) {
+    if (path === '/login' || path === '/') {
+      const { data: usuario } = await supabase
+        .from('usuarios').select('rol').eq('id', user.id).single()
+      const destino = usuario?.rol === 'admin' ? '/admin/dashboard' : '/inicio'
+      return NextResponse.redirect(new URL(destino, request.url))
+    }
+    if (path.startsWith('/admin')) {
+      const { data: usuario } = await supabase
+        .from('usuarios').select('rol').eq('id', user.id).single()
+      if (usuario?.rol !== 'admin') {
+        return NextResponse.redirect(new URL('/inicio', request.url))
+      }
     }
   }
+
   return supabaseResponse
 }
 
