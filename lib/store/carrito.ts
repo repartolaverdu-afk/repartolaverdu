@@ -6,6 +6,7 @@ interface CarritoStore {
   items: ItemCarrito[]
   addItem: (item: ItemCarrito) => void
   updateCantidad: (producto_unidad_id: string, cantidad: number) => void
+  setNotas: (producto_unidad_id: string, notas: string) => void
   removeItem: (producto_unidad_id: string) => void
   clear: () => void
 }
@@ -40,6 +41,13 @@ export const useCarrito = create<CarritoStore>()(
                   i.producto_unidad_id === id ? { ...i, cantidad } : i
                 )
               : state.items.filter((i) => i.producto_unidad_id !== id),
+        })),
+
+      setNotas: (id, notas) =>
+        set((state) => ({
+          items: state.items.map((i) =>
+            i.producto_unidad_id === id ? { ...i, notas_item: notas } : i
+          ),
         })),
 
       removeItem: (id) =>
