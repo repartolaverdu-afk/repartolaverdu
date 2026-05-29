@@ -35,7 +35,7 @@ export default function CarritoPage() {
         if (data?.length) {
           clear()
           for (const item of data) {
-            const pu = item.producto_unidad as { unidad: string; producto: { nombre: string } } | null
+            const pu = item.producto_unidad as unknown as { unidad: string; producto: { nombre: string } } | null
             addItem({
               producto_unidad_id: item.producto_unidad_id,
               producto_nombre: pu?.producto?.nombre ?? '',
