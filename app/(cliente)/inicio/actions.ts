@@ -42,7 +42,7 @@ export async function repetirPedidoAction(pedidoId: string) {
       producto_unidad_id: item.producto_unidad_id,
       cantidad_solicitada: item.cantidad_solicitada,
       precio_unitario: preciosMap.get(item.producto_unidad_id)
-        ?? (item.producto_unidad as { precio_base: number } | null)?.precio_base
+        ?? (item.producto_unidad as unknown as { precio_base: number } | null)?.precio_base
         ?? 0,
       notas_item: item.notas_item,
     }))
