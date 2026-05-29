@@ -40,7 +40,7 @@ export default async function CatalogoPage() {
   const productosMap = new Map<string, ProductoCatalogo>()
 
   for (const u of unidades ?? []) {
-    const prod = u.producto as { id: string; nombre: string; categoria: string | null; activo: boolean } | null
+    const prod = u.producto as unknown as { id: string; nombre: string; categoria: string | null; activo: boolean } | null
     if (!prod?.activo) continue
 
     if (!productosMap.has(prod.id)) {
