@@ -83,7 +83,7 @@ export default async function AdminPedidosPage({
           <p className="text-center text-gray-400 text-sm py-12">No hay pedidos</p>
         ) : (
           pedidos.map((pedido) => {
-            const cliente = pedido.cliente as { nombre: string } | null
+            const cliente = pedido.cliente as unknown as { nombre: string } | null
             const cantItems = (pedido.detalle_pedido as { id: string }[]).length
             const fecha = new Date(pedido.fecha_pedido).toLocaleDateString('es-AR', {
               day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit',
