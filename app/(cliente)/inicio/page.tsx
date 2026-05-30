@@ -31,9 +31,16 @@ export default async function InicioPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b px-5 py-4">
-        <p className="text-sm text-gray-500">Buen día,</p>
-        <h1 className="text-xl font-bold text-gray-800">{nombre}</h1>
+      <header className="bg-white border-b px-5 py-4 flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-500">Buen día,</p>
+          <h1 className="text-xl font-bold text-gray-800">{nombre}</h1>
+        </div>
+        <form action="/logout" method="POST">
+          <button type="submit" className="text-xs text-gray-400 hover:text-red-500 transition-colors">
+            Salir
+          </button>
+        </form>
       </header>
 
       <div className="flex-1 px-5 py-6 space-y-4 max-w-lg mx-auto w-full">

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LayoutDashboard, ClipboardList, ListOrdered, Package, Users } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, ListOrdered, Package, Users, LogOut } from 'lucide-react'
 
 const nav = [
   { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Inicio' },
@@ -26,6 +26,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <span className="text-[10px] font-medium">{label}</span>
             </Link>
           ))}
+          <form action="/admin/logout" method="POST" className="flex-1">
+            <button type="submit" className="w-full flex flex-col items-center gap-1 py-2 text-gray-400 hover:text-red-500 transition-colors">
+              <LogOut className="w-5 h-5" />
+              <span className="text-[10px] font-medium">Salir</span>
+            </button>
+          </form>
         </div>
       </nav>
     </div>
