@@ -31,8 +31,9 @@ export async function GET(
 
   if (!pedido) return new Response('Not Found', { status: 404 })
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buffer = await pdf(
-    createElement(ComprobantePDF, { pedido: pedido as any })
+    createElement(ComprobantePDF, { pedido: pedido as any }) as any
   ).toBuffer()
 
   return new Response(buffer, {
