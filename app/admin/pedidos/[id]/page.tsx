@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { EstadoPedido } from '@/types'
 import FormularioPedidoAdmin from './FormularioPedidoAdmin'
+import BotonesComprobante from './BotonesComprobante'
 
 const estadoBadge: Record<EstadoPedido, string> = {
   BORRADOR:       'bg-gray-100 text-gray-500',
@@ -128,6 +129,8 @@ export default async function AdminDetallePedidoPage({
           notasAdminInicial={pedido.notas_admin}
           items={items}
         />
+
+        <BotonesComprobante pedidoId={id} numeroPedido={pedido.numero_pedido} />
       </div>
     </div>
   )
