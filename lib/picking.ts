@@ -15,7 +15,7 @@ export async function buildPickingData(supabase: SupabaseClient) {
       p.id,
       {
         numeroPedido: p.numero_pedido as number,
-        clienteNombre: (p.cliente as { nombre: string } | null)?.nombre ?? '—',
+        clienteNombre: (p.cliente as unknown as { nombre: string } | null)?.nombre ?? '—',
       },
     ])
   )
