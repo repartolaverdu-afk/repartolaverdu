@@ -1,3 +1,5 @@
+import PrintButton from './PrintButton'
+
 export default function ManualPage() {
   return (
     <>
@@ -516,9 +518,7 @@ export default function ManualPage() {
         </div>
       </div>
 
-      <button className="print-btn" onClick={() => window.print()}>
-        🖨️ Guardar como PDF
-      </button>
+      <PrintButton />
     </>
   )
 }
