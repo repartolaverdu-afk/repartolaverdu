@@ -170,15 +170,13 @@ export default function FormularioPedidoAdmin({
               {isPending ? 'Actualizando...' : 'Marcar entregado'}
             </button>
           )}
-          {estado !== 'CANCELADO' && (
-            <button
+          <button
               onClick={() => handleCambiarEstado('CANCELADO')}
               disabled={isPending}
               className="w-full text-red-400 hover:text-red-600 text-sm font-medium py-2 transition-colors"
             >
               Cancelar pedido
             </button>
-          )}
         </div>
       )}
     </div>
