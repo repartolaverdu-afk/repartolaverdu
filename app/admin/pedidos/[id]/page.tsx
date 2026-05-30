@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { EstadoPedido } from '@/types'
 import FormularioPedidoAdmin from './FormularioPedidoAdmin'
 
@@ -31,7 +32,8 @@ export default async function AdminDetallePedidoPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: pedido } = await supabase
+  const admin = createAdminClient()
+  const { data: pedido } = await admin
     .from('pedidos')
     .select(`
       id, numero_pedido, fecha_pedido, estado, total_estimado, notas_cliente, notas_admin,

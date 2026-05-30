@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function crearClienteAction(datos: {
   nombre: string; email: string; password: string
@@ -12,8 +13,6 @@ export async function crearClienteAction(datos: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Crear usuario en Supabase Auth
-  const { createAdminClient } = await import('@/lib/supabase/admin')
   const admin = createAdminClient()
 
   const { data: nuevoUser, error } = await admin.auth.admin.createUser({
@@ -24,7 +23,9 @@ export async function crearClienteAction(datos: {
 
   if (error || !nuevoUser.user) return { error: error?.message ?? 'Error al crear usuario' }
 
-  await admin.from('usuarios').update({
+  // Upsert para cubrir tanto el caso en que el trigger ya corrió como cuando no
+  await admin.from('usuarios').upsert({
+    id: nuevoUser.user.id,
     nombre: datos.nombre.trim(),
     telefono: datos.telefono.trim() || null,
     direccion: datos.direccion.trim() || null,
@@ -32,7 +33,7 @@ export async function crearClienteAction(datos: {
     dia_entrega: datos.dia_entrega.trim() || null,
     rol: 'cliente',
     activo: true,
-  }).eq('id', nuevoUser.user.id)
+  }, { onConflict: 'id' })
 
   revalidatePath('/admin/clientes')
   return { error: null }
@@ -46,7 +47,8 @@ export async function actualizarClienteAction(id: string, datos: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  await supabase.from('usuarios').update({
+  const admin = createAdminClient()
+  await admin.from('usuarios').update({
     nombre: datos.nombre.trim(),
     telefono: datos.telefono.trim() || null,
     direccion: datos.direccion.trim() || null,
@@ -63,7 +65,8 @@ export async function toggleClienteAction(id: string, activo: boolean) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  await supabase.from('usuarios').update({ activo }).eq('id', id)
+  const admin = createAdminClient()
+  await admin.from('usuarios').update({ activo }).eq('id', id)
   revalidatePath('/admin/clientes')
 }
 
@@ -80,8 +83,10 @@ export async function guardarPreciosEspecialesAction(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const admin = createAdminClient()
+
   for (const p of precios) {
-    const { data: existente } = await supabase
+    const { data: existente } = await admin
       .from('precios_cliente')
       .select('id')
       .eq('cliente_id', clienteId)
@@ -90,15 +95,15 @@ export async function guardarPreciosEspecialesAction(
 
     if (p.precio_especial && p.precio_especial > 0) {
       if (existente) {
-        await supabase.from('precios_cliente')
+        await admin.from('precios_cliente')
           .update({ precio_especial: p.precio_especial, activo: true })
           .eq('id', existente.id)
       } else {
-        await supabase.from('precios_cliente')
+        await admin.from('precios_cliente')
           .insert({ cliente_id: clienteId, producto_unidad_id: p.producto_unidad_id, precio_especial: p.precio_especial, activo: true })
       }
     } else if (existente) {
-      await supabase.from('precios_cliente').delete().eq('id', existente.id)
+      await admin.from('precios_cliente').delete().eq('id', existente.id)
     }
   }
 

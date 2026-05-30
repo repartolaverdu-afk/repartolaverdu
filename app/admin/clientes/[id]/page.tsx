@@ -2,6 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { actualizarClienteAction } from '../actions'
 import PreciosEspeciales from './PreciosEspeciales'
 
@@ -15,10 +16,11 @@ export default async function ClienteDetallePage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const admin = createAdminClient()
   const [{ data: cliente }, { data: unidades }, { data: preciosEsp }] = await Promise.all([
-    supabase.from('usuarios').select('id, nombre, telefono, direccion, zona_entrega, dia_entrega, activo').eq('id', id).single(),
-    supabase.from('producto_unidades').select('id, unidad, precio_base, producto:producto_id(nombre, categoria)').eq('activo', true),
-    supabase.from('precios_cliente').select('producto_unidad_id, precio_especial').eq('cliente_id', id).eq('activo', true),
+    admin.from('usuarios').select('id, nombre, telefono, direccion, zona_entrega, dia_entrega, activo').eq('id', id).single(),
+    admin.from('producto_unidades').select('id, unidad, precio_base, producto:producto_id(nombre, categoria)').eq('activo', true),
+    admin.from('precios_cliente').select('producto_unidad_id, precio_especial').eq('cliente_id', id).eq('activo', true),
   ])
 
   if (!cliente) notFound()

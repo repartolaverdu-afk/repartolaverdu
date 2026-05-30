@@ -2,12 +2,14 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ClipboardList, ListOrdered, AlertCircle, Truck, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const admin = createAdminClient()
   const hoy = new Date().toISOString().split('T')[0]
 
   const [
@@ -16,14 +18,14 @@ export default async function AdminDashboardPage() {
     { count: entregadosHoy },
     { data: totalesHoy },
   ] = await Promise.all([
-    supabase.from('pedidos').select('*', { count: 'exact', head: true })
+    admin.from('pedidos').select('*', { count: 'exact', head: true })
       .eq('estado', 'ENVIADO'),
-    supabase.from('pedidos').select('*', { count: 'exact', head: true })
+    admin.from('pedidos').select('*', { count: 'exact', head: true })
       .in('estado', ['CONFIRMADO', 'CON_FALTANTES', 'EN_PREPARACION']),
-    supabase.from('pedidos').select('*', { count: 'exact', head: true })
+    admin.from('pedidos').select('*', { count: 'exact', head: true })
       .eq('estado', 'ENTREGADO')
       .gte('fecha_pedido', hoy),
-    supabase.from('pedidos').select('total_estimado')
+    admin.from('pedidos').select('total_estimado')
       .not('estado', 'in', '("BORRADOR","CANCELADO")')
       .gte('fecha_pedido', hoy),
   ])

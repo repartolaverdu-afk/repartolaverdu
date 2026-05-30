@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { EstadoPedido } from '@/types'
 
 const ESTADOS: { value: EstadoPedido | 'TODOS'; label: string }[] = [
@@ -41,7 +42,8 @@ export default async function AdminPedidosPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  let query = supabase
+  const admin = createAdminClient()
+  let query = admin
     .from('pedidos')
     .select(`
       id, numero_pedido, fecha_pedido, estado, total_estimado,

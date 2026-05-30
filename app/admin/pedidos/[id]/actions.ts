@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { EstadoPedido } from '@/types'
 
 export type ItemUpdate = {
@@ -21,9 +22,11 @@ export async function confirmarPedidoAdminAction(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const admin = createAdminClient()
+
   await Promise.all(
     items.map((item) =>
-      supabase
+      admin
         .from('detalle_pedido')
         .update({
           cantidad_confirmada: item.cantidad_confirmada,
@@ -37,7 +40,7 @@ export async function confirmarPedidoAdminAction(
   const hayFaltantes = items.some((i) => i.faltante)
   const nuevoEstado: EstadoPedido = hayFaltantes ? 'CON_FALTANTES' : 'CONFIRMADO'
 
-  await supabase
+  await admin
     .from('pedidos')
     .update({
       estado: nuevoEstado,
@@ -55,7 +58,8 @@ export async function cambiarEstadoAction(pedidoId: string, estado: EstadoPedido
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  await supabase.from('pedidos').update({ estado }).eq('id', pedidoId)
+  const admin = createAdminClient()
+  await admin.from('pedidos').update({ estado }).eq('id', pedidoId)
 
   revalidatePath(`/admin/pedidos/${pedidoId}`)
   revalidatePath('/admin/pedidos')

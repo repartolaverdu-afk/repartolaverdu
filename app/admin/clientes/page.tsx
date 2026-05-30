@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { toggleClienteAction } from './actions'
 import NuevoCliente from './NuevoCliente'
 
@@ -10,7 +11,8 @@ export default async function AdminClientesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: clientes } = await supabase
+  const admin = createAdminClient()
+  const { data: clientes } = await admin
     .from('usuarios')
     .select('id, nombre, telefono, zona_entrega, dia_entrega, activo')
     .eq('rol', 'cliente')
