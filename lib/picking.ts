@@ -40,7 +40,7 @@ export async function buildPickingData(supabase: SupabaseClient) {
   const productoMap = new Map<string, PickingPorProducto>()
 
   for (const d of detalles) {
-    const pu = d.producto_unidad as {
+    const pu = d.producto_unidad as unknown as {
       id: string; unidad: string;
       producto: { nombre: string; categoria: string | null }
     } | null
@@ -76,7 +76,7 @@ export async function buildPickingData(supabase: SupabaseClient) {
   const clienteMap = new Map<string, PickingPorCliente>()
 
   for (const d of detalles) {
-    const pu = d.producto_unidad as {
+    const pu = d.producto_unidad as unknown as {
       id: string; unidad: string;
       producto: { nombre: string }
     } | null
