@@ -64,16 +64,22 @@ export default function ImportarExcel() {
     })
   }
 
-  const descargarPlantilla = () => {
-    const data = [
-      { nombre: 'Tomate redondo', categoria: 'Verduras', unidad: 'kg', precio_base: 850 },
-      { nombre: 'Tomate redondo', categoria: 'Verduras', unidad: 'cajon', precio_base: 13500 },
-      { nombre: 'Papa', categoria: 'Verduras', unidad: 'bolsa', precio_base: 8500 },
-    ]
-    const ws = XLSX.utils.json_to_sheet(data)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, 'Productos')
-    XLSX.writeFile(wb, 'plantilla-productos.xlsx')
+  const [exportando, setExportando] = useState(false)
+
+  const descargarPlantilla = async () => {
+    setExportando(true)
+    try {
+      const res = await fetch('/api/admin/productos/export')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'productos.xlsx'
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setExportando(false)
+    }
   }
 
   if (!abierto) {
@@ -99,10 +105,11 @@ export default function ImportarExcel() {
 
       <button
         onClick={descargarPlantilla}
-        className="flex items-center gap-2 text-xs text-green-700 hover:underline"
+        disabled={exportando}
+        className="flex items-center gap-2 text-xs text-green-700 hover:underline disabled:opacity-50"
       >
         <Download className="w-3.5 h-3.5" />
-        Descargar plantilla de ejemplo
+        {exportando ? 'Generando...' : 'Descargar productos actuales (Excel)'}
       </button>
 
       <div className="text-xs text-gray-500 bg-gray-50 rounded-xl p-3 space-y-1">
